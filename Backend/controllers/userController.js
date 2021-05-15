@@ -24,7 +24,7 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, device } = req.body;
 
   // Validate email & password
   if (!email || !password) {
@@ -32,6 +32,20 @@ exports.login = async (req, res) => {
       message: "Please provide an email and password",
     });
   }
+
+   // Validate sender
+   if (!device) {
+    return res.status(400).json({
+      message: "Please specify sending device",
+    });
+  }
+
+  if (device!=="Web" && device!="Mobile") {
+    return res.status(400).json({
+      message: "Invalid device type",
+    });
+  }
+
 
   // Check for user
   const user = await User.findOne({ email }).select("+password");
@@ -48,6 +62,12 @@ exports.login = async (req, res) => {
   if (!isMatch) {
     return res.status(401).json({
       message: "Invalid credentials",
+    });
+  }
+
+  if(user.role!="Admin" && device=="Web"){
+    return res.status(403).json({
+      message: "Not authorized",
     });
   }
 

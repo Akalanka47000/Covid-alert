@@ -1,0 +1,33 @@
+<div class="container-fluid">
+    <div class="col-md-4 col-sm-10">
+      <div class="card login-card">
+        <div class="card-body">
+          <div style="height: 5vh;">
+  
+          </div>
+          <div class="">
+            <h1 class="login-text">LOGIN</h1>
+          </div>
+            <div class="form-group">
+              <span>Email</span>
+              <input type="text" class="form-control" required placeholder="abc@gmail.com" [(ngModel)]="email">
+            </div>
+            <div class="form-group">
+              <span>Password</span> <span *ngIf="password">*</span>
+              <input type="password" class="form-control" placeholder="password" [(ngModel)]="password">
+  
+            </div>
+            <div class="form-group">
+              <div class="block-row">
+                <button  type="submit" class="btn btn-primary loginbtn text-center" (click)="login();">Login</button>
+              </div>
+  
+            </div>
+          <br>
+          <div class="block-row">
+            <p><a href="#">Forgot Password?</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,233 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import '../node_modules/bootstrap/dist/css/bootstrap.css';
+
+html, body {
+    height: 100%;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100vh;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    position: fixed;
+}
+
+.row {
+    margin: 0;
+}
+
+.center-row {
+    justify-content: space-evenly;
+    justify-items: center;
+}
+
+.text-center {
+    text-align: center;
+}
+.text-left{
+    text-align: left;
+}
+.block-row {
+    display: block;
+    text-align: center;
+}
+
+.col-md-12 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.topnav {
+    height: 4em;
+    top: 0;
+    left: 0;
+}
+
+.router-content {
+    padding: 2em 1em 2em 0.5em;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.card-header {
+    background-color: rgb(255, 255, 255);
+    border: none;
+}
+
+.add {
+    background: #30c1f8;
+   box-shadow: 1px 1px 5px #a5d3ff91, -1px -1px 25px #a1d2ff91;
+}
+.view{
+    background: #5c37ff;
+    box-shadow: 1px 1px 3px #a5aeff91, -1px -1px 25px #a1afff91;
+}
+.delete{
+    background: #f83030;
+    box-shadow: 1px 1px 5px #ffa5a591, -1px -1px 25px #ffa1a191;
+}
+button:focus{
+    outline: 1px;
+    outline: 0px auto -webkit-focus-ring-color;
+
+}
+
+.btn-round{
+    border-radius: 50%;
+    height: 3em;
+    width: 3em;
+
+}
+.no-border{
+    border: none;
+}
+.invert{
+  filter: brightness(0) invert(1) !important
+}
+
+.btn-icon{
+    width: 1.5em !important;
+    height: 1.5em !important;
+}
+.focused {
+    border-radius: 14px;
+    background: #4f89ff;
+    box-shadow: 1px 3px 4px #03215e, 1px -2px 3px 0px #ffffff6b;
+}
+.title{
+    font-weight: 500 !important;
+    letter-spacing: 0px !important;
+    font-family: system-ui !important;
+    margin-top: 1.5em;
+    font-size: larger;
+}
+.width-full{
+    width: 100%;
+}
+.w-30{
+    width: 30%;
+}
+.w-e-6{
+    width: 6em;
+}
+.table-icon{
+    width: 1em !important;
+    height: 1em;
+}
+.span-small{
+    font-size: smaller;
+    font-weight: 500;
+    margin-left: 0.5em;
+}
+.span-large{
+    font-size: large;
+    font-weight: 700;
+}
+.flex-col{
+    display:flex;
+    flex-direction: column;
+}
+.flex-left{
+    justify-content: start;
+
+}
+.scroll-x{
+    overflow-x: auto;
+}
+
+.btn-round:hover{
+    filter: brightness(1.5);
+    transform: scale(1.1);
+}
+.advanced-pie-legend{
+    width: 100% !important;
+}
+.advanced-pie-legend .total-value {
+    font-size: 36px !important;
+    color: red !important;
+}
+.advanced-pie-legend .total-label {
+    font-size: 18px !important;
+    color: red !important;
+    margin-bottom: 19px;
+    margin-top: 5px;
+}
+/* number value each country */
+.advanced-pie-legend .legend-items-container .legend-items .legend-item .item-value {
+    font-size: 24px;
+    margin-left: 11px;
+    margin-top: 12px !important;
+}
+/* name each country */
+.advanced-pie-legend .legend-items-container .legend-items .legend-item .item-label {
+    font-size: 14px;
+    margin-left: 11px;
+    margin-top: 12px !important;
+    opacity: .7;
+}
+/* percentaage  */
+.advanced-pie-legend .legend-items-container .legend-items .legend-item .item-percent {
+    font-size: 24px;
+    margin-left: 11px;
+    opacity: 1;
+    color: rgb(228, 111, 82);
+}
+.advanced-pie-legend .legend-items-container .legend-items {
+   height: 100%;
+    /* white-space: normal !important; */
+    /* margin-bottom: 2em !important; */
+}
+.advanced-pie-legend .legend-items-container .legend-items .legend-item {
+    margin-right: 5px !important;
+}
+.ngx-charts {
+    float: left;
+    overflow: visible;
+    height: 250px;
+}
+
+.customBtn{
+    background: #ffffff;
+    box-shadow: 0px 1px 5px #c29cff91, -0px 3px 20px #7cc0ff91 !important;
+    opacity: 1;
+   
+}
+
+.customBtn:hover {
+    background: rgb(67, 180, 255);
+    
+}
+
+.infoCard{
+    background-color:#5064d6; 
+    box-shadow: 1px 1px 8px #89c6ff91, -1px -1px 25px #978bff91;
+    border-radius: 20px;
+    width: 50vw;
+    height: 40vh;
+
+  }
+
+  .infoCard:hover {
+    background-color:#5c6fd8; 
+  }
+
+  .infoCardText{
+    color: white;
+  }
+
+  .grpIcon{
+    color: white;
+    font-size: 10vw;
+  }
+
+  .grpIcon:hover {
+    cursor: pointer;
+  }
+  
+  .cdk-global-scrollblock {
+    overflow-y: hidden;
+}
