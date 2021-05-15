@@ -1,7 +1,21 @@
 const crypto = require("crypto");
 const mongoose = require("mongoose");
+require('mongoose-double')(mongoose);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
+var SchemaTypes = mongoose.Schema.Types;
+
+const locationSchema=mongoose.Schema({
+  latitude: {
+    type: SchemaTypes.Double,
+    required: [true, "Please add a latitude"],
+  },
+  longitude: {
+    type: SchemaTypes.Double,
+    required: [true, "Please add a longitude"],
+  },
+});
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -17,13 +31,9 @@ const UserSchema = new mongoose.Schema({
       "Please add a valid email",
     ],
   },
-  photo: {
-    type: String,
-    default: "no-photo.jpg",
-  },
   role: {
     type: String,
-    enum: ["User", "Publisher"],
+    enum: ["User", "Admin"],
     default: "User",
   },
   password: {
@@ -32,33 +42,14 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
-  category: {
+  firebaseToken: {
     type: String,
-    required: [true, "Please add a category"],
-    enum: ["Cycling", "Hiking", "Swimming"],
+    default: "",
   },
-  likes: [
-    {
-      user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-      },
-    },
-  ],
-  dislikes: [
-    {
-      user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-      },
-    },
-  ],
-  myEvent: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Event",
-    },
-  ],
+  location: {
+    type:locationSchema,
+    required: [true, "Please add a location"],
+  },  
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
@@ -66,6 +57,7 @@ const UserSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
 
 // Encrypt password using bcrypt
 UserSchema.pre("save", async function (next) {

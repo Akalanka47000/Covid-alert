@@ -1,7 +1,7 @@
 const User = require("../models/User");
 
 exports.register = async (req, res) => {
-  const { name, email, password, role, category } = req.body;
+  const { name, email, password, location } = req.body;
 
   // Check if user is already exist
   let Euser = await User.findOne({ email });
@@ -17,8 +17,7 @@ exports.register = async (req, res) => {
     name,
     email,
     password,
-    role,
-    category,
+    location,
   });
 
   sendTokenResponse(user, 200, res);
@@ -53,6 +52,44 @@ exports.login = async (req, res) => {
   }
 
   sendTokenResponse(user, 200, res);
+};
+
+// @desc    Update user location
+// @route   PUT /users/location/:id
+// @access  Private/Admin
+
+exports.updateLocation =async (req, res,next) => {
+
+  const { location } = req.body;
+
+  let user = await User.findById(req.params.id);
+ 
+  if (!user) {
+    return next(
+      res.status(200).json({
+        message: `User not found with id of ${req.params.id}`,
+      })
+    );
+  }
+
+   
+  if (!location.latitude || !location.longitude) {
+    return next(
+      res.status(200).json({
+        message: `latitude or longitude is missing`,
+      })
+    );
+  }
+
+   user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
 };
 
 // Get token from model, create cookie and send response

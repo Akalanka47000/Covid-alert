@@ -4,5 +4,6 @@ const userController = require("../controllers/userController");
 
 router.post("/login", catchErrors(userController.login));
 router.post("/register", catchErrors(userController.register));
+router.put("/location/:id", catchErrors(userController.updateLocation));
 
 module.exports = router;
