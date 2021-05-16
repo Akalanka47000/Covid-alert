@@ -9,8 +9,11 @@
             <button mat-raised-button class="customBtn btn" color="primary" (click)="setLocation()"  >Alert People</button>
         </div>
         <div style="width: 1vw;"></div>
+        <input #fileUpload type="file" (click)="fileUpload.value = ''"(change)="uploadFile($event)" style="display:none"
+        accept="image/*">
+
         <div >
-            <button mat-raised-button class="customBtn btn" color="primary" (click)="uploadImages()"  >Upload Images</button>
+            <button mat-raised-button class="customBtn btn" color="primary" (click)="fileUpload.click()"  >Upload Images</button>
         </div>
     </div>
     <div style="height:1.5vh;">

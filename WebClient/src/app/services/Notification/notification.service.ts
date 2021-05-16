@@ -19,4 +19,16 @@ export class NotificationService {
     }
     return this.http.post(url,body,{'headers':header});
   }
+
+  uploadImage(base64URL:String){
+    let url = "http://localhost:8000/notification/uploadImage";
+    let header = new HttpHeaders({
+      'Content-Type': 'application/json',
+    })
+    let body = {
+      'base64URL': base64URL
+    }
+    return this.http.put(url,body,{'headers':header});
+  }
+
 }

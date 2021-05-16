@@ -41,8 +41,36 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  uploadImages(){
-    console.log("uploading images");
+  uploadFile(fileInput:any) {
+    if (fileInput.target.files && fileInput.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+          const image = new Image();
+          image.src = e.target.result;
+          image.onload = rs => {
+              const imgBase64Path = e.target.result;
+              this.notificationService.uploadImage(imgBase64Path).subscribe((data:any)=>{
+                Swal.fire({
+                  icon: 'success',
+                  heightAuto: false,
+                  title:'<small><b>Image Uploaded</b></small>',
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              },
+              (err:any) =>{ 
+                Swal.fire({
+                  icon: 'error',
+                  heightAuto: false,
+                  title:'<small><b>An error has occured</b></small>',
+                  showConfirmButton: false,
+                  timer: 1500,
+                })
+              });
+          };
+      };
+      reader.readAsDataURL(fileInput.target.files[0]);
+    }
   }
 
 }

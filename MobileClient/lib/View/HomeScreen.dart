@@ -236,7 +236,7 @@ buildCard(Color color, IconData icon, String title, String value){
                       key: _scaffoldKey,
                       appBar: AppBar(
                         elevation: 7,
-                        backgroundColor: Colors.redAccent,
+                        backgroundColor: Colors.red,
                         automaticallyImplyLeading: false,
                         title: Padding(
                           padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.15, 0, 0, 0),
@@ -303,7 +303,7 @@ buildCard(Color color, IconData icon, String title, String value){
                                       padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.02),
                                       child: Container(
                                         width: MediaQuery.of(context).size.width*0.25,
-                                        height: MediaQuery.of(context).size.height*0.2,
+                                        height: MediaQuery.of(context).orientation == Orientation.portrait?MediaQuery.of(context).size.height*0.2:MediaQuery.of(context).size.height*0.4,
                                         child: Image(
                                           image: AssetImage("assets/images/SL.png"),
                                         ),
@@ -311,7 +311,7 @@ buildCard(Color color, IconData icon, String title, String value){
                                     ),
                                     buildCard(Colors.blue, Icons.local_hospital, "Total Cases", latestDetails["Confirmed"].toString()),
                                     buildCard(Colors.red, Icons.new_releases, "Active Cases", latestDetails["Active"].toString()),
-                                    //buildCard(Colors.yellow, Icons.today, "Daily Cases", "3,000"),
+                                    buildCard(Colors.yellow, Icons.today, "Daily Cases", (latestDetails["Confirmed"]-snapshot.data[snapshot.data.length-3]["Confirmed"]).toString()),
                                     buildCard(Colors.greenAccent, Icons.sentiment_satisfied_outlined, "Recovered", latestDetails["Recovered"].toString()),
                                     buildCard(Colors.blueGrey, Icons.sentiment_dissatisfied_outlined, "Deaths", latestDetails["Deaths"].toString()),
                                   ],
@@ -329,7 +329,7 @@ buildCard(Color color, IconData icon, String title, String value){
                       ),
                       bottomNavigationBar: BottomAppBar(
                         elevation: 0,
-                        color: Colors.redAccent,
+                        color: Colors.red,
                         child: TabBar(
                           unselectedLabelColor: Colors.black87,
                           labelColor: Colors.white,
