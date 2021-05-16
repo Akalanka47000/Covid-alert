@@ -1,7 +1,9 @@
+import 'package:covid_alert/Controllers/covidDataController.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:covid_alert/Helpers/CacheService.dart';
 import 'package:covid_alert/Helpers/Constants.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:covid_alert/Models/CustomWidgetModels/MenuItemModel.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
@@ -17,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   AnimationController _settingsButtonRotationController;
-
+  Future myFuture;
   String selectedSetting;
 
   List<MenuItems> menuItems;
@@ -150,6 +152,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
+    myFuture=getCovidStats(Constants.covidServerUrl,"Sri Lanka");
     _settingsButtonRotationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
@@ -216,128 +219,150 @@ buildCard(Color color, IconData icon, String title, String value){
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: onBackPressed,
-      child: ProgressHUD(
-        child: Builder(
-          builder: (context) {
-            final progress = ProgressHUD.of(context);
-            return DefaultTabController(
-              length: 3,
-              child: Scaffold(
-                key: _scaffoldKey,
-                appBar: AppBar(
-                  elevation: 7,
-                  backgroundColor: Colors.redAccent,
-                  automaticallyImplyLeading: false,
-                  title: Padding(
-                    padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.15, 0, 0, 0),
-                    child: Center(
-                      child: Text(
-                        "Statistics",
-                        style: GoogleFonts.montserrat(
-                          textStyle: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                        child: GestureDetector(
-                          onTap: () {
-                            _settingsButtonRotationController.forward();
-                            Future.delayed(Duration(milliseconds: 1000), () {
-                              _settingsButtonRotationController.reset();
-                            });
-                            showMenuItems(progress);
-                          },
-                          child: RotationTransition(
-                            turns: Tween(begin: 0.0, end: 1.0).animate(_settingsButtonRotationController),
-                            child: Icon(
-                              Icons.settings,
-                              size: 28,
-                            ),
-                          ),
-                        )),
-                  ],
-                ),
-                body: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/BG3.jpg"),
-                      colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  child: TabBarView(
-                    children: [
-                      Container(
-                        // decoration: BoxDecoration(
-                        //   gradient: LinearGradient(
-                        //     begin: Alignment.topCenter,
-                        //     end: Alignment.bottomCenter,
-                        //     colors: [Colors.black, Colors.black.withOpacity(0.98)],
-                        //   ),
-                        // ),
-                        color:Colors.transparent,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height:MediaQuery.of(context).size.height*0.03
-                              ),
-                              Padding(
-                                padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.02),
-                                child: Container(
-                                  width: MediaQuery.of(context).size.width*0.25,
-                                  height: MediaQuery.of(context).size.height*0.2,
-                                  child: Image(
-                                    image: AssetImage("assets/images/SL.png"),
-                                  ),
+    return FutureBuilder<List<dynamic>>(
+      future: myFuture,
+      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+        if (snapshot.hasData) {
+          var latestDetails=snapshot.data.last;
+          return WillPopScope(
+            onWillPop: onBackPressed,
+            child: ProgressHUD(
+              child: Builder(
+                builder: (context) {
+                  final progress = ProgressHUD.of(context);
+                  return DefaultTabController(
+                    length: 1,
+                    child: Scaffold(
+                      key: _scaffoldKey,
+                      appBar: AppBar(
+                        elevation: 7,
+                        backgroundColor: Colors.redAccent,
+                        automaticallyImplyLeading: false,
+                        title: Padding(
+                          padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.15, 0, 0, 0),
+                          child: Center(
+                            child: Text(
+                              "Statistics",
+                              style: GoogleFonts.montserrat(
+                                textStyle: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white,
                                 ),
                               ),
-                              buildCard(Colors.blue, Icons.local_hospital, "Total Cases", "140,000"),
-                              buildCard(Colors.red, Icons.new_releases, "Active Cases", "20,000"),
-                              buildCard(Colors.yellow, Icons.today, "Daily Cases", "3,000"),
-                              buildCard(Colors.greenAccent, Icons.sentiment_satisfied_outlined, "Recovered", "120,000"),
-                              buildCard(Colors.blueGrey, Icons.sentiment_dissatisfied_outlined, "Deaths", "1,000"),
-                            ],
+                            ),
                           ),
                         ),
+                        actions: [
+                          Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  _settingsButtonRotationController.forward();
+                                  Future.delayed(Duration(milliseconds: 1000), () {
+                                    _settingsButtonRotationController.reset();
+                                  });
+                                  showMenuItems(progress);
+                                },
+                                child: RotationTransition(
+                                  turns: Tween(begin: 0.0, end: 1.0).animate(_settingsButtonRotationController),
+                                  child: Icon(
+                                    Icons.settings,
+                                    size: 28,
+                                  ),
+                                ),
+                              )),
+                        ],
                       ),
-                      Container(
-                        color: Colors.transparent,
+                      body: Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/BG3.jpg"),
+                            colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: TabBarView(
+                          children: [
+                            Container(
+                              // decoration: BoxDecoration(
+                              //   gradient: LinearGradient(
+                              //     begin: Alignment.topCenter,
+                              //     end: Alignment.bottomCenter,
+                              //     colors: [Colors.black, Colors.black.withOpacity(0.98)],
+                              //   ),
+                              // ),
+                              color:Colors.transparent,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        height:MediaQuery.of(context).size.height*0.03
+                                    ),
+                                    Padding(
+                                      padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.02),
+                                      child: Container(
+                                        width: MediaQuery.of(context).size.width*0.25,
+                                        height: MediaQuery.of(context).size.height*0.2,
+                                        child: Image(
+                                          image: AssetImage("assets/images/SL.png"),
+                                        ),
+                                      ),
+                                    ),
+                                    buildCard(Colors.blue, Icons.local_hospital, "Total Cases", latestDetails["Confirmed"].toString()),
+                                    buildCard(Colors.red, Icons.new_releases, "Active Cases", latestDetails["Active"].toString()),
+                                    //buildCard(Colors.yellow, Icons.today, "Daily Cases", "3,000"),
+                                    buildCard(Colors.greenAccent, Icons.sentiment_satisfied_outlined, "Recovered", latestDetails["Recovered"].toString()),
+                                    buildCard(Colors.blueGrey, Icons.sentiment_dissatisfied_outlined, "Deaths", latestDetails["Deaths"].toString()),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            // Container(
+                            //   color: Colors.transparent,
+                            // ),
+                            // Container(
+                            //   color: Colors.transparent,
+                            // ),
+                          ],
+                        ),
                       ),
-                      Container(
-                        color: Colors.transparent,
+                      bottomNavigationBar: BottomAppBar(
+                        elevation: 0,
+                        color: Colors.redAccent,
+                        child: TabBar(
+                          unselectedLabelColor: Colors.black87,
+                          labelColor: Colors.white,
+                          //indicatorColor: Colors.white,
+                          indicatorColor: Colors.redAccent,
+                          tabs: [
+                            buildTab(Icons.home),
+                            // buildTab(Icons.search),
+                            // buildTab(Icons.calendar_today),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                bottomNavigationBar: BottomAppBar(
-                  elevation: 0,
-                  color: Colors.redAccent,
-                  child: TabBar(
-                    unselectedLabelColor: Colors.black87,
-                    labelColor: Colors.white,
-                    indicatorColor: Colors.white,
-                    tabs: [
-                      buildTab(Icons.home),
-                      buildTab(Icons.search),
-                      buildTab(Icons.calendar_today),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          print(snapshot.error);
+          return Center(
+            child: Text("An error has occurred, please restart the application"),
+          );
+        } else {
+          return Center(
+            child: SpinKitWanderingCubes(
+              color: Colors.redAccent,
+              size: MediaQuery.of(context).size.width * 0.25,
+            ),
+          );
+        }
+      },
     );
+
   }
 }
