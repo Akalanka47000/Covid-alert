@@ -28,6 +28,7 @@ app.use(require("cors")());
 
 //Bring in the routes
 app.use("/user", require("./routes/user"));
+app.use("/notification", require("./routes/notification"));
 
 const PORT = process.env.PORT || 8000;
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "316914124568",
+    "project_id": "covid-alert-aa50f",
+    "storage_bucket": "covid-alert-aa50f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316914124568:android:c3a7b2ba2a07816198006d",
+        "android_client_info": {
+          "package_name": "com.covid_alert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "316914124568-uq093qpu566c2sps28mrrvglb5b0ojr4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAb21EoulMjsTr1JuwF-nLR2llUCNCtduo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "316914124568-uq093qpu566c2sps28mrrvglb5b0ojr4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

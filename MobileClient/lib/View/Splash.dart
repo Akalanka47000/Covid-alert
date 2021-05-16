@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:covid_alert/Controllers/authController.dart';
 import 'package:covid_alert/Helpers/CacheService.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:covid_alert/View/LoginScreen.dart';
 import 'package:covid_alert/Helpers/Constants.dart';
@@ -17,17 +18,20 @@ class splash extends StatefulWidget {
 class _splashState extends State<splash> {
 
   Future<bool> checkLoginStatus() async {
-    Timer(Duration(seconds: 6), () async {
+    print("checking");
+    var result=Future.delayed(Duration(milliseconds: 3000), ()async {
       bool status = await CacheService.getLoggedInStatus();
       if(status==true){
 
       }else{
         status=false;
       }
+      print(status);
       return status;
     });
-  }
+    return result;
 
+  }
 
   loginProcedure(BuildContext context)async{
     String email=await CacheService.getUserEmail();
@@ -43,6 +47,9 @@ splashContent(){
   return Column(
     mainAxisAlignment: MainAxisAlignment.center,
     children: <Widget>[
+      SizedBox(
+        height:MediaQuery.of(context).size.height*0.1
+      ),
       Padding(
         padding:  EdgeInsets.fromLTRB(0, 0, 0, MediaQuery.of(context).size.height*0.02,),
         child: Container(
@@ -54,8 +61,8 @@ splashContent(){
         ),
       ),
       SpinKitDoubleBounce(
-        color: Color(0xFF57beff),
-        size: MediaQuery.of(context).orientation == Orientation.portrait?MediaQuery.of(context).size.height*0.123:MediaQuery.of(context).size.height*0.175,
+        color: Colors.red,
+        size: MediaQuery.of(context).orientation == Orientation.portrait?MediaQuery.of(context).size.height*0.1:MediaQuery.of(context).size.height*0.175,
       ),
     ],
   );
@@ -64,24 +71,32 @@ splashContent(){
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: checkLoginStatus(), // a previously-obtained Future<String> or null
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (snapshot.hasData) {
-          if(snapshot.data==true){
-            loginProcedure(context);
+    try{
+      return FutureBuilder<bool>(
+        future: checkLoginStatus(), // a previously-obtained Future<String> or null
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.hasData) {
+            print(snapshot.data);
+            if(snapshot.data==true){
+              loginProcedure(context);
+            }else{
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => LoginScreen()));
+              });
+            }
             return splashContent();
-          }else{
-            return LoginScreen();
+          } else if (snapshot.hasError) {
+            print(snapshot.error);
+            return splashContent();
+          } else {
+            return splashContent();
           }
-        } else if (snapshot.hasError) {
-          print(snapshot.error);
-          return splashContent();
-        } else {
-          return splashContent();
-        }
-      },
-    );
+        },
+      );
+    }catch(e){
+      return splashContent();
+    }
+
 
   }
 }

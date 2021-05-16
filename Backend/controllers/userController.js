@@ -93,7 +93,7 @@ exports.updateLocation =async (req, res,next) => {
  
   if (!user) {
     return next(
-      res.status(200).json({
+      res.status(400).json({
         message: `User not found with id of ${req.params.id}`,
       })
     );
@@ -102,7 +102,7 @@ exports.updateLocation =async (req, res,next) => {
    
   if (!location.latitude || !location.longitude) {
     return next(
-      res.status(200).json({
+      res.status(400).json({
         message: `latitude or longitude is missing`,
       })
     );

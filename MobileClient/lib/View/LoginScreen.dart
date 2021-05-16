@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: <Widget>[
             Text(
               title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.redAccent),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
             ),
             SizedBox(
               height: 10,
@@ -40,14 +40,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 enabledBorder: new OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
                   borderSide: BorderSide(
-                    color: Colors.black87,
+                    color: Colors.redAccent,
                     width: 1,
                   ),
                 ),
                 focusedBorder: new OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
                   borderSide: BorderSide(
-                    color: Colors.redAccent,
+                    color: Colors.white,
                     width: 1,
                   ),
                 ),
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 filled: true,
               ),
               style: TextStyle(
-                color: Colors.black87,
+                color: Colors.white,
               ),
             ),
           ],
@@ -110,38 +110,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _divider() {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: 20,
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Divider(
-                thickness: 1,
-              ),
-            ),
-          ),
-          Text('or'),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: Divider(
-                thickness: 1,
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 20,
-          ),
-        ],
-      ),
-    );
-  }
 
 
 
@@ -159,7 +127,9 @@ class _LoginScreenState extends State<LoginScreen> {
           children: <Widget>[
             Text(
               'Don\'t have an account ?',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  fontSize: 13, fontWeight: FontWeight.w600,color: Colors.white
+              ),
             ),
             SizedBox(
               width: 10,
@@ -183,16 +153,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-          text: 'Qick',
+          text: 'Covid',
           style: GoogleFonts.portLligatSans(
             textStyle: Theme.of(context).textTheme.display1,
             fontSize: 30,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: Colors.white,
           ),
           children: [
             TextSpan(
-              text: 'Team',
+              text: ' Alert',
               style: TextStyle(color: Colors.redAccent, fontSize: 30),
             ),
           ]),
@@ -220,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFFe4e4e4), Color(0xFFe4e4e4)],
+              colors: [Colors.black, Colors.black.withOpacity(0.98)],
             ),
           ),
           height: height,
