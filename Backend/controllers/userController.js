@@ -3,6 +3,13 @@ const User = require("../models/User");
 exports.register = async (req, res) => {
   const { name, email, password, location } = req.body;
 
+  // Validate details
+  if (!email || !password || !name) {
+    return res.status(400).json({
+      message: "Please provide an email, password and a name",
+    });
+  }
+
   // Check if user is already exist
   let Euser = await User.findOne({ email });
 
@@ -131,5 +138,5 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true, token });
+    .json({ success: true,userID:user.id,token });
 };

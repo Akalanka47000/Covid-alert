@@ -9,11 +9,11 @@ var SchemaTypes = mongoose.Schema.Types;
 const locationSchema=mongoose.Schema({
   latitude: {
     type: SchemaTypes.Double,
-    required: [true, "Please add a latitude"],
+    default:-1.0
   },
   longitude: {
     type: SchemaTypes.Double,
-    required: [true, "Please add a longitude"],
+    default:-1.0
   },
 });
 
@@ -48,7 +48,12 @@ const UserSchema = new mongoose.Schema({
   },
   location: {
     type:locationSchema,
-    required: [true, "Please add a location"],
+    default:{
+      "location":{
+        "latitude":-1.0,
+        "longitude":-1.0
+      }
+    },
   },  
   resetPasswordToken: String,
   resetPasswordExpire: Date,

@@ -1,16 +1,19 @@
 
-<div class="container-fluid">
+<div class="container-fluid" style="overflow: auto;">
     <div style="height: 5vh;"></div>
     <div id="map"></div>
-    <div fxLayout="row" fxLayoutAlign="center center" style="width: 100%;" class="row">
-        <div style="margin-left: 40vw;">
+    <div style="height:1.5vh;">
+    </div>
+    <div fxLayout="row" fxLayoutAlign="center center" style="width: 100%;justify-content: center" class="row">
+        <div>
             <button mat-raised-button class="customBtn btn" color="primary" (click)="setLocation()"  >Alert People</button>
         </div>
         <div style="width: 1vw;"></div>
-        <div style="margin-right: 40vw;">
+        <div >
             <button mat-raised-button class="customBtn btn" color="primary" (click)="uploadImages()"  >Upload Images</button>
         </div>
     </div>
+    <div style="height:1.5vh;">
 </div>
 
 
