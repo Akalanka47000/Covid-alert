@@ -68,8 +68,8 @@ Future<String> registerUser(String url, String email, String password, String na
       headers: {"Content-Type": "application/json"},
       body: body,
     );
+    final responseJson = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      final responseJson = jsonDecode(response.body);
       if (responseJson["success"] == true) {
         Constants.userID=responseJson["userID"];
         Constants.notificationStatus=responseJson["notificationStatus"];
@@ -89,7 +89,7 @@ Future<String> registerUser(String url, String email, String password, String na
         return responseJson["message"];
       }
     } else {
-      return "An error has occurred. Please try again later";
+      return responseJson["message"];
     }
   } catch (e) {
     return "Server didn't respond";
