@@ -28,11 +28,12 @@ Future<String> login(String url, String email, String password) async {
     if (response.statusCode == 200) {
       if (responseJson["success"] == true) {
         Constants.userID=responseJson["userID"];
+        Constants.notificationStatus=responseJson["notificationStatus"];
         String firebaseToken=await FirebaseMessaging.instance.getToken();
         var location= await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-        String updateStatus=await updateUser(url,firebaseToken,location.latitude,location.longitude,Constants.userID);
+        await CacheService.saveJWTToken(responseJson["token"]);
+        String updateStatus=await updateLocationAndToken(url,firebaseToken,location.latitude,location.longitude,Constants.userID);
         if(updateStatus==null){
-          await CacheService.saveJWTToken(responseJson["token"]);
           await CacheService.saveUserEmail(email);
           await CacheService.saveUserPassword(password);
           await CacheService.saveLoggedInStatus(true);
@@ -71,11 +72,12 @@ Future<String> registerUser(String url, String email, String password, String na
       final responseJson = jsonDecode(response.body);
       if (responseJson["success"] == true) {
         Constants.userID=responseJson["userID"];
+        Constants.notificationStatus=responseJson["notificationStatus"];
         String firebaseToken=await FirebaseMessaging.instance.getToken();
         var location= await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-        String updateStatus=await updateUser(url,firebaseToken,location.latitude,location.longitude,Constants.userID);
+        await CacheService.saveJWTToken(responseJson["token"]);
+        String updateStatus=await updateLocationAndToken(url,firebaseToken,location.latitude,location.longitude,Constants.userID);
         if(updateStatus==null){
-          await CacheService.saveJWTToken(responseJson["token"]);
           await CacheService.saveUserEmail(email);
           await CacheService.saveUserPassword(password);
           await CacheService.saveLoggedInStatus(true);

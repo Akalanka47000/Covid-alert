@@ -10,8 +10,10 @@ export class NotificationService {
 
   notifyUsers(latitude:any,longitude:any){
     let url = "http://localhost:8000/notification/send";
+    let Bearer = localStorage.getItem("Bearer");
     let header = new HttpHeaders({
       'Content-Type': 'application/json',
+      'Authorization':'Bearer '+Bearer,
     })
     let body = {
       'latitude': latitude,
@@ -22,8 +24,10 @@ export class NotificationService {
 
   uploadImage(base64URL:String){
     let url = "http://localhost:8000/notification/uploadImage";
+    let Bearer = localStorage.getItem("Bearer");
     let header = new HttpHeaders({
       'Content-Type': 'application/json',
+      'Authorization':'Bearer '+Bearer,
     })
     let body = {
       'base64URL': base64URL

@@ -31,8 +31,7 @@ export class SignInComponent implements OnInit {
       })
     }else{
       this.authService.userAuthentication(this.email,this.password).subscribe((data:any)=>{
-          localStorage.setItem("Bearer",data["access_token"]);
-          sessionStorage.setItem("currentNavIndex", "0")
+          localStorage.setItem("Bearer",data["token"]);
           this.router.navigate(['home']);
       },
       (err:any) =>{ 

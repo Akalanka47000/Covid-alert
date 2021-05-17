@@ -8,9 +8,7 @@ import 'package:covid_alert/Controllers/authController.dart';
 
 import 'HomeScreen.dart';
 
-
 class RegisterScreen extends StatefulWidget {
-
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -20,8 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-
-  Widget _entryField(String title, {bool isPassword,bool isName}) {
+  Widget _entryField(String title, {bool isPassword, bool isName}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -35,7 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             height: 10,
           ),
           TextField(
-            controller: isName?_nameController:(isPassword?_passwordController:_emailController),
+            controller: isName ? _nameController : (isPassword ? _passwordController : _emailController),
             obscureText: isPassword,
             decoration: InputDecoration(
               isDense: true,
@@ -68,23 +65,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _submitButton(var progress) {
     return GestureDetector(
-      onTap: ()async{
-          progress.show();
-          String name = _nameController.text;
-          String email = _emailController.text;
-          String password = _passwordController.text;
-          String authenticationMessage = await registerUser(Constants.serverUrl, email, password, name);
-          progress.dismiss();
-          if (authenticationMessage == null) {
-            Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => HomeScreen()));
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.redAccent,
-                content: Text(authenticationMessage),
-              ),
-            );
-          }
+      onTap: () async {
+        progress.show();
+        String name = _nameController.text;
+        String email = _emailController.text;
+        String password = _passwordController.text;
+        String authenticationMessage = await registerUser(Constants.serverUrl, email, password, name);
+        progress.dismiss();
+        if (authenticationMessage == null) {
+          Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => HomeScreen()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.redAccent,
+              content: Text(authenticationMessage),
+            ),
+          );
+        }
       },
       child: Container(
         width: MediaQuery.of(context).size.width,
@@ -117,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: <Widget>[
             Text(
               'Already have an account ?',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600,color: Colors.white),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
             ),
             SizedBox(
               width: 10,
@@ -155,67 +152,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget _emailPasswordWidget() {
     return Column(
       children: <Widget>[
-        _entryField("Username",isPassword:false,isName:true),
-        _entryField("Email",isPassword:false,isName:false),
-        _entryField("Password",isPassword:true,isName:false),
+        _entryField("Username", isPassword: false, isName: true),
+        _entryField("Email", isPassword: false, isName: false),
+        _entryField("Password", isPassword: true, isName: false),
       ],
     );
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return ProgressHUD(
-      child: Builder(builder:(context){
-        final progress = ProgressHUD.of(context);
-        return Scaffold(
-          body: Container(
-            height: height,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.black, Colors.black.withOpacity(0.98)],
+      child: Builder(
+        builder: (context) {
+          final progress = ProgressHUD.of(context);
+          return Scaffold(
+            body: Container(
+              height: height,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/images/BG.jpg"),
+                  colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: SingleChildScrollView(
-              child: Stack(
-                children: <Widget>[
-                  Positioned(
-                    top: -MediaQuery.of(context).size.height * .15,
-                    right: -MediaQuery.of(context).size.width * .4,
-                    child: BezierContainer(),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(height: height * .2),
-                        _title(),
-                        SizedBox(
-                          height: 50,
-                        ),
-                        _emailPasswordWidget(),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        _submitButton(progress),
-                        //SizedBox(height: height * 0),
-                        _loginAccountLabel(),
-                      ],
+              child: SingleChildScrollView(
+                child: Stack(
+                  children: <Widget>[
+                    Positioned(
+                      top: -MediaQuery.of(context).size.height * .15,
+                      right: -MediaQuery.of(context).size.width * .4,
+                      child: BezierContainer(),
                     ),
-                  ),
-                ],
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(height: MediaQuery.of(context).size.height*0.28),
+                          _title(),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          _emailPasswordWidget(),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          _submitButton(progress),
+                          //SizedBox(height: height * 0),
+                          _loginAccountLabel(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },),
+          );
+        },
+      ),
     );
   }
 }

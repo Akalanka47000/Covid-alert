@@ -186,13 +186,13 @@ class _LoginScreenState extends State<LoginScreen> {
         final progress = ProgressHUD.of(context);
         return Scaffold(
             body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.black, Colors.black.withOpacity(0.98)],
-            ),
-          ),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/images/BG.jpg"),
+                  colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
+                  fit: BoxFit.cover,
+                ),
+              ),
           height: height,
           child: SingleChildScrollView(
             child: Stack(

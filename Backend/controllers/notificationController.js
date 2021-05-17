@@ -25,7 +25,7 @@ exports.sendNotification = async (req, res) => {
     for(let i=0;i<users.length;i++){
       let distance=getDistance(latitude,longitude,users[i].location.latitude,users[i].location.longitude);
       console.log(distance);
-      if(distance<1){
+      if(distance<1 && users[i].notifications==true){
         var registrationToken = users[i].firebaseToken;
         var payload = {
           notification: {
