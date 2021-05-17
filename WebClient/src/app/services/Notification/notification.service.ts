@@ -8,8 +8,10 @@ export class NotificationService {
 
   constructor(private readonly http:HttpClient) { }
 
+  serverURL="http://ec2-13-213-51-110.ap-southeast-1.compute.amazonaws.com:8000";
+
   notifyUsers(latitude:any,longitude:any){
-    let url = "http://localhost:8000/notification/send";
+    let url = this.serverURL+"/notification/send";
     let Bearer = localStorage.getItem("Bearer");
     let header = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -23,7 +25,7 @@ export class NotificationService {
   }
 
   uploadImage(base64URL:String){
-    let url = "http://localhost:8000/notification/uploadImage";
+    let url = this.serverURL+"/notification/uploadImage";
     let Bearer = localStorage.getItem("Bearer");
     let header = new HttpHeaders({
       'Content-Type': 'application/json',

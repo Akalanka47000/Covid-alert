@@ -8,8 +8,10 @@ export class AuthenticationService {
 
   constructor(private readonly http:HttpClient) { }
 
+  serverURL="http://ec2-13-213-51-110.ap-southeast-1.compute.amazonaws.com:8000";
+
   userAuthentication(username:String,password:String){
-    let url = "http://localhost:8000/user/login";
+    let url = this.serverURL+"/user/login";
     let header = new HttpHeaders({
       'Content-Type': 'application/json',
     })
