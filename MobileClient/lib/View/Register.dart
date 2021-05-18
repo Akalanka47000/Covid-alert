@@ -26,7 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: <Widget>[
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Constants.theme == "Dark" ?Colors.white:Colors.black),
           ),
           SizedBox(
             height: 10,
@@ -47,7 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               focusedBorder: new OutlineInputBorder(
                 borderRadius: BorderRadius.circular(5),
                 borderSide: BorderSide(
-                  color: Colors.white,
+                  color: Constants.theme == "Dark" ?Colors.white:Colors.black,
                   width: 1,
                 ),
               ),
@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               filled: true,
             ),
             style: TextStyle(
-              color: Colors.white,
+              color: Constants.theme == "Dark" ?Colors.white:Colors.black,
             ),
           )
         ],
@@ -114,7 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: <Widget>[
             Text(
               'Already have an account ?',
-              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color:Constants.theme == "Dark" ? Colors.white:Colors.black),
             ),
             SizedBox(
               width: 10,
@@ -138,7 +138,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             textStyle: Theme.of(context).textTheme.display1,
             fontSize: 30,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color:Constants.theme == "Dark" ? Colors.white:Colors.black,
           ),
           children: [
             TextSpan(
@@ -172,7 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/images/BG.jpg"),
-                  colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
+                  colorFilter:  Constants.theme == "Dark" ?new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken):new ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.hardLight),
                   fit: BoxFit.cover,
                 ),
               ),

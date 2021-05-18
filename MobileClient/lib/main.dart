@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'Helpers/Constants.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GestureBinding.instance.resamplingEnabled = true;
@@ -16,6 +18,7 @@ void main() async {
 class LMK extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Constants().initialize();
     Paint.enableDithering = true;
     final textTheme = Theme.of(context).textTheme;
     return MaterialApp(

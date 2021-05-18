@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:covid_alert/Controllers/covidDataController.dart';
 import 'package:covid_alert/Controllers/userController.dart';
+import 'package:covid_alert/View/InformationDialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:covid_alert/Helpers/CacheService.dart';
@@ -9,7 +12,8 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:covid_alert/Models/CustomWidgetModels/MenuItemModel.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'LoginScreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,6 +30,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String selectedCountry = null;
   var progress;
   var countryDataCache;
+  var formatter;
+
+
+//callback to update the state of the screen
+  void setStateCallback() {
+    setState(() {});
+  }
+
 
   List<MenuItems> menuItems;
   showMenuItems() {
@@ -41,20 +53,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           return StatefulBuilder(builder: (context, setState) {
             //Menu item list which is displayed when settings button is clicked
             menuItems = [
-              MenuItems(icon: Constants.notificationStatus?Icons.notifications_off:Icons.notifications, itemName: Constants.notificationStatus?"Disable Notifications":"Enable Notifications", color: Colors.blue),
+              MenuItems(
+                  icon: Constants.notificationStatus ? Icons.notifications_off : Icons.notifications,
+                  itemName: Constants.notificationStatus ? "Disable Notifications" : "Enable Notifications",
+                  color: Colors.blue),
+              MenuItems(icon: Icons.color_lens, itemName: "Change Theme [${Constants.theme}]", color: Colors.blue),
               MenuItems(icon: Icons.logout, itemName: "Logout", color: Colors.blue),
             ];
             return Container(
-              height: MediaQuery.of(context).orientation == Orientation.portrait
-                  ? MediaQuery.of(context).size.height * 0.12 * (menuItems.length)
-                  : MediaQuery.of(context).size.height * 0.32 * (menuItems.length),
+              height: MediaQuery.of(context).orientation == Orientation.portrait ? 270 : MediaQuery.of(context).size.height * 0.32 * (menuItems.length),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topRight: Radius.circular(20),
                   topLeft: Radius.circular(20),
                 ),
                 gradient: new LinearGradient(
-                  colors: [Colors.black.withOpacity(0.95), Colors.black],
+                  colors:  Constants.theme == "Dark" ? [Colors.black.withOpacity(0.95), Colors.black]:[Colors.black.withOpacity(0), Colors.black.withOpacity(0.2)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -69,11 +83,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 4,
                       width: 50,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Constants.theme == "Dark" ?Colors.white:Colors.black,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.white10,
-                            spreadRadius: 3,
+                            color:  Constants.theme == "Dark" ?Colors.white10:Colors.black26,
+                            spreadRadius: Constants.theme == "Dark" ?3:1,
                             blurRadius: 2,
                             offset: Offset(0, 0),
                           ),
@@ -100,18 +114,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               await CacheService.saveLoggedInStatus(false);
                               await FirebaseMessaging.instance.deleteToken();
                               Navigator.pushReplacement(context, new MaterialPageRoute(builder: (context) => LoginScreen()));
-                            } else if(menuItem=="Disable Notifications" || menuItem=="Enable Notifications"){
+                            } else if (menuItem == "Disable Notifications" || menuItem == "Enable Notifications") {
                               progress.show();
-                              String updateMessage = await setNotificationStatus(Constants.serverUrl,!Constants.notificationStatus,Constants.userID);
+                              String updateMessage = await setNotificationStatus(Constants.serverUrl, !Constants.notificationStatus, Constants.userID);
                               progress.dismiss();
                               Navigator.of(context).pop();
                               if (updateMessage == null) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: Colors.redAccent,
-                                    content:Text(
-                                        menuItem=="Disable Notifications"?"Notifications disabled":"Notifications enabled"
-                                    ),
+                                    content: Text(menuItem == "Disable Notifications" ? "Notifications disabled" : "Notifications enabled"),
                                   ),
                                 );
                               } else {
@@ -122,8 +134,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   ),
                                 );
                               }
-                              Constants.notificationStatus=!Constants.notificationStatus;
-                            }else{
+                              Constants.notificationStatus = !Constants.notificationStatus;
+                            } else if (menuItem == "Change Theme [${Constants.theme}]") {
+                              if (Constants.theme == "Dark") {
+                                Constants.theme = "Light";
+                                CacheService.setTheme("Light");
+                              } else {
+                                Constants.theme = "Dark";
+                                CacheService.setTheme("Dark");
+                              }
+                              setState(() {
+                                print("Theme Changed");
+                              });
+                              setStateCallback();
+                              Navigator.of(context).pop();
+                            } else {
                               Navigator.of(context).pop();
                             }
                           },
@@ -134,9 +159,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 color: menuItems[index].color.shade100,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.white10,
-                                    spreadRadius: 3,
-                                    blurRadius: 2,
+                                    color: Constants.theme == "Dark" ?Colors.white10:Colors.black.withOpacity(0.15),
+                                    spreadRadius: Constants.theme == "Dark" ?3:1,
+                                    blurRadius: Constants.theme == "Dark" ?2:5,
                                     offset: Offset(0, 0),
                                   ),
                                 ],
@@ -152,7 +177,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             title: Text(
                               menuItems[index].itemName,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Constants.theme == "Dark" ?Colors.white:Colors.black,
                               ),
                             ),
                           ),
@@ -180,7 +205,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-    myFuture = getCovidStats(Constants.covidServerUrl, "Sri Lanka");
+    formatter = NumberFormat('###,000');
+    myFuture = getCovidStatsHPB();
     countryFuture = getCountries(Constants.covidServerUrl);
     _settingsButtonRotationController = AnimationController(
       duration: const Duration(milliseconds: 1000),
@@ -194,11 +220,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
     _settingsButtonRotationController.dispose();
   }
-  buildDefaultCard(String text,IconData icon){
+
+  buildDefaultCard(String text, IconData icon) {
     return Column(
       children: [
         Container(
-          height: MediaQuery.of(context).size.height*0.15,
+          height: MediaQuery.of(context).size.height * 0.15,
         ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.1),
@@ -206,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Container(
               height: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.5,
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.7),
+                color:  Constants.theme == "Dark" ?Colors.blue.withOpacity(0.7):Colors.white.withOpacity(0.7),
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 boxShadow: <BoxShadow>[
                   BoxShadow(color: Colors.blue.withAlpha(100), offset: Offset(1, 4), blurRadius: 8, spreadRadius: 2),
@@ -219,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Icon(
                     icon,
                     size: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.width * 0.3 : MediaQuery.of(context).size.height * 0.3,
-                    color: Colors.white,
+                    color:  Constants.theme == "Dark" ?Colors.white:Colors.black.withOpacity(0.7),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.06, 10, MediaQuery.of(context).size.width * 0.06, 0),
@@ -230,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         textStyle: TextStyle(
                           height: 1.5,
                           fontSize: 15,
-                          color: Colors.white,
+                          color:  Constants.theme == "Dark" ?Colors.white:Colors.black,
                         ),
                       ),
                     ),
@@ -243,7 +270,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ],
     );
   }
+buildContactCard(IconData icon, String name, String contact){
+    return Padding(
+      padding:   Constants.theme == "Dark" ?EdgeInsets.all(20.0):EdgeInsets.all(18),
+      child: Container(
+        width: MediaQuery.of(context).size.width*0.9,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          color:  Constants.theme == "Dark" ?Colors.transparent:Colors.white.withOpacity(0.85),
+          boxShadow: [
+            BoxShadow(
+              color:  Constants.theme == "Dark" ?Colors.transparent:Colors.black.withOpacity(0.3),
+              blurRadius: 15,
+              spreadRadius: 1,
+              offset: Offset(1,2)
 
+            )
+          ]
+        ),
+        child: Padding(
+          padding:   Constants.theme == "Dark" ?EdgeInsets.zero:EdgeInsets.all(8.0),
+          child: Column(
+            children:[
+              Icon(
+                icon,
+                color:  Constants.theme == "Dark" ?Colors.white:Colors.black,
+                size: 30,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: Text(
+                  name,
+                  style: TextStyle(
+                    color:  Constants.theme == "Dark" ?Colors.white:Colors.black,
+                    fontSize: 18
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                  var number='tel:$contact';
+                  if (await canLaunch(number)) {
+                  await launch(number);
+                  } else {
+                  print('Could not launch $number');
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(3.0),
+                  child: Text(
+                    contact,
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                        fontSize: 18
+                    ),
+                  ),
+                ),
+              ),
+            ]
+          ),
+        ),
+      ),
+    );
+}
   buildCard(Color color, IconData icon, String title, String value) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05, vertical: MediaQuery.of(context).size.height * 0.025),
@@ -252,7 +341,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         padding: EdgeInsets.symmetric(vertical: 15),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.6),
+          color:  Constants.theme == "Dark" ?color.withOpacity(0.6):color.withOpacity(0.75),
           borderRadius: BorderRadius.all(Radius.circular(20)),
           boxShadow: <BoxShadow>[
             BoxShadow(color: color.withAlpha(100), offset: Offset(1, 4), blurRadius: 8, spreadRadius: 2),
@@ -298,14 +387,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  buildCovidStatBody(var latestDetails, AsyncSnapshot snapshot){
+  buildCovidStatBody(String tab, AsyncSnapshot snapshot) {
     return Column(
       children: [
-        buildCard(Colors.blue, Icons.local_hospital, "Total Cases", snapshot.data[snapshot.data.length - 2]["Confirmed"].toString()),
-        buildCard(Colors.redAccent, Icons.new_releases, "Active Cases", snapshot.data[snapshot.data.length - 2]["Active"].toString()),
-        buildCard(Colors.yellow, Icons.today, "Daily Cases", (snapshot.data[snapshot.data.length - 2]["Confirmed"] - snapshot.data[snapshot.data.length - 3]["Confirmed"]).toString()),
-        buildCard(Colors.greenAccent, Icons.sentiment_satisfied_outlined, "Recovered", snapshot.data[snapshot.data.length - 2]["Recovered"].toString()),
-        buildCard(Colors.blueGrey, Icons.sentiment_dissatisfied_outlined, "Deaths", snapshot.data[snapshot.data.length - 2]["Deaths"].toString()),
+        buildCard(
+          Colors.blue,
+          Icons.local_hospital,
+          "Total Cases",
+          tab == "firstTab"
+              ? (Constants.localStats ? formatter.format(snapshot.data["data"]["local_total_cases"]).toString() : formatter.format(snapshot.data["data"]["global_total_cases"]).toString())
+              : formatter.format(snapshot.data[snapshot.data.length - 2]["Confirmed"]).toString(),
+        ),
+        buildCard(
+          Colors.redAccent,
+          Icons.new_releases,
+          "Active Cases",
+          tab == "firstTab"
+              ? (Constants.localStats
+                  ? formatter.format(snapshot.data["data"]["local_active_cases"]).toString()
+                  : formatter.format((snapshot.data["data"]["global_total_cases"] - (snapshot.data["data"]["global_recovered"] + snapshot.data["data"]["global_deaths"]))).toString())
+              : formatter.format(snapshot.data[snapshot.data.length - 2]["Active"]).toString(),
+        ),
+        buildCard(
+          Colors.yellow,
+          Icons.today,
+          "Daily Cases",
+          tab == "firstTab"
+              ? (Constants.localStats ? snapshot.data["data"]["local_new_cases"]==0?"0":formatter.format(snapshot.data["data"]["local_new_cases"]).toString() : formatter.format(snapshot.data["data"]["global_new_cases"]).toString())
+              : formatter.format((snapshot.data[snapshot.data.length - 2]["Confirmed"] - snapshot.data[snapshot.data.length - 3]["Confirmed"])).toString(),
+        ),
+        buildCard(
+          Colors.greenAccent,
+          Icons.sentiment_satisfied_outlined,
+          "Recovered",
+          tab == "firstTab"
+              ? (Constants.localStats ? formatter.format(snapshot.data["data"]["local_recovered"]).toString() : formatter.format(snapshot.data["data"]["global_recovered"]).toString())
+              : formatter.format(snapshot.data[snapshot.data.length - 2]["Recovered"]).toString(),
+        ),
+        buildCard(
+          Colors.blueGrey,
+          Icons.sentiment_dissatisfied_outlined,
+          "Deaths",
+          tab == "firstTab"
+              ? (Constants.localStats ? formatter.format(snapshot.data["data"]["local_deaths"]).toString() : formatter.format(snapshot.data["data"]["global_deaths"]).toString())
+              : formatter.format(snapshot.data[snapshot.data.length - 2]["Deaths"]).toString(),
+        ),
       ],
     );
   }
@@ -314,26 +440,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     print("Searching");
     List<dynamic> searchResults = List();
     for (dynamic country in countryList) {
-      if (country["Country"].toUpperCase() == pattern.toUpperCase() ||(pattern.length>=3 && country["Country"].toUpperCase().toString().contains(pattern.toUpperCase()) )) {
+      if (country["Country"].toUpperCase() == pattern.toUpperCase() || (pattern.length >= 3 && country["Country"].toUpperCase().toString().contains(pattern.toUpperCase()))) {
         searchResults.add(country);
       }
     }
     return searchResults;
   }
 
-bool refresh=true;
-Future<List<dynamic>>getRefreshedData()async{
-    if(refresh==true){
-      print("a");
-      var data=await getCovidStats(Constants.covidServerUrl, selectedCountry);
-      refresh=false;
-      print("b");
-      countryDataCache=data;
+  bool refresh = true;
+  Future<List<dynamic>> getRefreshedData() async {
+    if (refresh == true) {
+      var data = await getCovidStats(Constants.covidServerUrl, selectedCountry);
+      refresh = false;
+      countryDataCache = data;
       return data;
-    }else{
+    } else {
       return countryDataCache;
     }
-}
+  }
 
   Future<bool> onBackPressed() {}
 
@@ -344,9 +468,9 @@ Future<List<dynamic>>getRefreshedData()async{
       child: ProgressHUD(
         child: Builder(
           builder: (context) {
-             progress = ProgressHUD.of(context);
+            progress = ProgressHUD.of(context);
             return DefaultTabController(
-              length: 2,
+              length: 3,
               child: Scaffold(
                 key: _scaffoldKey,
                 appBar: PreferredSize(
@@ -354,31 +478,50 @@ Future<List<dynamic>>getRefreshedData()async{
                   child: Container(
                     decoration: BoxDecoration(boxShadow: [
                       BoxShadow(
-                        color: Colors.black,
-                        blurRadius: 6.0,
+                        color: Constants.theme == "Dark" ?Colors.black:Colors.black45,
+                        blurRadius:  Constants.theme == "Dark" ?6.0:10,
                         offset: Offset(0, 2),
                       ),
                     ]),
                     child: AppBar(
                       elevation: 3,
-                      backgroundColor: Colors.black,
+                      backgroundColor: Constants.theme == "Dark" ?Colors.black:Colors.white,
                       shadowColor: Colors.black,
                       automaticallyImplyLeading: false,
                       title: Padding(
-                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.15, 0, 0, 0),
+                        padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.25, 0, 0, 0),
                         child: Center(
                           child: Text(
                             "Statistics",
                             style: GoogleFonts.montserrat(
                               textStyle: TextStyle(
                                 fontSize: 22,
-                                color: Colors.white,
+                                color: Constants.theme == "Dark" ?Colors.white:Colors.black,
                               ),
                             ),
                           ),
                         ),
                       ),
                       actions: [
+                        GestureDetector(
+                          onTap: (){
+                            return showDialog(
+                                context: context,
+                                builder: (BuildContext context2) {
+                                  return StatefulBuilder(
+                                    builder: (context3, setState) {
+                                      return InformationDialog();
+                                    },
+                                  );
+                                });
+
+                          },
+                          child: Icon(
+                            Icons.coronavirus,
+                            size: 28,
+                            color: Constants.theme == "Dark" ?Colors.redAccent:Colors.black,
+                          ),
+                        ),
                         Padding(
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                             child: GestureDetector(
@@ -394,7 +537,7 @@ Future<List<dynamic>>getRefreshedData()async{
                                 child: Icon(
                                   Icons.settings,
                                   size: 28,
-                                  color: Colors.redAccent,
+                                  color:Constants.theme == "Dark" ? Colors.redAccent:Colors.black,
                                 ),
                               ),
                             )),
@@ -406,55 +549,75 @@ Future<List<dynamic>>getRefreshedData()async{
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage("assets/images/BG3.jpg"),
-                      colorFilter: new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken),
+                      colorFilter: Constants.theme == "Dark" ?new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken):new ColorFilter.mode(Colors.white.withOpacity(0.2), BlendMode.hardLight),
                       fit: BoxFit.cover,
                     ),
                   ),
                   child: TabBarView(
                     children: [
-                  FutureBuilder<List<dynamic>>(
-                  future: myFuture,
-                    builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-                      if (snapshot.hasData) {
-                        var latestDetails = snapshot.data.last;
-                        return Container(
-                          color: Colors.transparent,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width * 0.25,
-                                    height: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.height * 0.2 : MediaQuery.of(context).size.height * 0.4,
-                                    child: Image(
-                                      image: AssetImage("assets/images/SL.png"),
+                      //Tab1 - local stats
+                      FutureBuilder<dynamic>(
+                        future: myFuture,
+                        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                          if (snapshot.hasData) {
+                            return Container(
+                              color: Colors.transparent,
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(0, MediaQuery.of(context).size.height * 0.02, 0, 0),
+                                      child: Transform.scale(
+                                        scale: 1.2,
+                                        child: Switch(
+                                          onChanged: (bool) {
+                                            setState(() {
+                                              Constants.localStats = !Constants.localStats;
+                                            });
+                                          },
+                                          value: !Constants.localStats,
+                                          activeColor:  Constants.theme == "Dark" ?Colors.blue:Colors.white,
+                                          activeTrackColor: Colors.green,
+                                          inactiveThumbColor: Colors.redAccent,
+                                          inactiveTrackColor:  Constants.theme == "Dark" ?Colors.orange:Colors.white,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
+                                      child: Container(
+                                        width: MediaQuery.of(context).size.width * 0.35,
+                                        height: MediaQuery.of(context).orientation == Orientation.portrait ? MediaQuery.of(context).size.height * 0.2 : MediaQuery.of(context).size.height * 0.4,
+                                        child: Image(
+                                          image: Constants.localStats ? AssetImage("assets/images/SL.png") : AssetImage("assets/images/globe.png"),
+                                        ),
+                                      ),
+                                    ),
+                                    buildCovidStatBody("firstTab", snapshot),
+                                  ],
                                 ),
-                                buildCovidStatBody(latestDetails, snapshot),
-                              ],
-                            ),
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        print(snapshot.error);
-                        return Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                          ),
-                        );
-                      } else {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                          ),
-                        );
-                      }
-                    },
-                  ),
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            print(snapshot.error);
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                              ),
+                            );
+                          } else {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+
+                      //Tab 2 - Search
                       FutureBuilder<List<dynamic>>(
                         future: countryFuture,
                         builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
@@ -466,19 +629,9 @@ Future<List<dynamic>>getRefreshedData()async{
                                     padding: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.05, 20, MediaQuery.of(context).size.width * 0.05, 20),
                                     child: TypeAheadField(
                                       textFieldConfiguration: TextFieldConfiguration(
-                                        //controller: _searchController,
+
                                         obscureText: false,
                                         decoration: InputDecoration(
-                                          suffixIcon: GestureDetector(
-                                            onTap: () {
-                                              print("Search clicked");
-                                            },
-                                            child: Icon(
-                                              Icons.search,
-                                              color: Colors.black54,
-                                              size: 23,
-                                            ),
-                                          ),
                                           hintText: "Enter Country Name",
                                           hintStyle: GoogleFonts.montserrat(
                                             textStyle: TextStyle(
@@ -517,7 +670,7 @@ Future<List<dynamic>>getRefreshedData()async{
                                       },
                                       itemBuilder: (context, suggestion) {
                                         return Container(
-                                          height: MediaQuery.of(context).size.height*0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           child: ListTile(
                                             tileColor: Colors.black,
                                             leading: Icon(
@@ -537,13 +690,13 @@ Future<List<dynamic>>getRefreshedData()async{
                                       onSuggestionSelected: (suggestion) {
                                         setState(() {
                                           selectedCountry = suggestion["Country"];
-                                          refresh=true;
+                                          refresh = true;
                                         });
                                       },
                                       noItemsFoundBuilder: (value) {
                                         return Container(
                                           color: Colors.black,
-                                          height: MediaQuery.of(context).size.height*0.07,
+                                          height: MediaQuery.of(context).size.height * 0.07,
                                           child: Center(
                                             child: Padding(
                                               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
@@ -563,59 +716,58 @@ Future<List<dynamic>>getRefreshedData()async{
                                     ),
                                   ),
                                   selectedCountry == null
-                                      ?buildDefaultCard("Search a country to view it's status",Icons.search)
+                                      ? buildDefaultCard("Search a country to view it's status", Icons.search)
                                       : FutureBuilder<List<dynamic>>(
-                                    future: getRefreshedData(),
-                                    builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-                                      if (snapshot.hasData && snapshot.connectionState!=ConnectionState.waiting) {
-                                        if(snapshot.data.isNotEmpty){
-                                          var latestDetails = snapshot.data.last;
-                                          return Container(
-                                            color: Colors.transparent,
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Padding(
-                                                    padding:  EdgeInsets.symmetric(vertical:MediaQuery.of(context).size.height * 0.01),
-                                                    child: Text(
-                                                      selectedCountry,
-                                                      style: GoogleFonts.montserrat(
-                                                        textStyle: TextStyle(
-                                                          height: 1.5,
-                                                          fontSize: 25,
-                                                          color: Colors.redAccent,
+                                          future: getRefreshedData(),
+                                          builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+                                            if (snapshot.hasData && snapshot.connectionState != ConnectionState.waiting) {
+                                              if (snapshot.data.isNotEmpty) {
+                                                return Container(
+                                                  color: Colors.transparent,
+                                                  child: SingleChildScrollView(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Padding(
+                                                          padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.01),
+                                                          child: Text(
+                                                            selectedCountry,
+                                                            style: GoogleFonts.montserrat(
+                                                              textStyle: TextStyle(
+                                                                height: 1.5,
+                                                                fontSize: 25,
+                                                                color: Colors.redAccent,
+                                                              ),
+                                                            ),
+                                                          ),
                                                         ),
-                                                      ),
+                                                        buildCovidStatBody("searchTab", snapshot),
+                                                      ],
                                                     ),
                                                   ),
-                                                  buildCovidStatBody(latestDetails, snapshot),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }else{
-                                          return buildDefaultCard("This country has no updated statistics yet",Icons.hourglass_empty);
-                                        }
-                                      } else if (snapshot.hasError) {
-                                        print(snapshot.error);
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                                          ),
-                                        );
-                                      } else {
-                                        return Container(
-                                           height: MediaQuery.of(context).size.height*0.7,
-                                          child: Center(
-                                            child: CircularProgressIndicator(
-                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                                            ),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
+                                                );
+                                              } else {
+                                                return buildDefaultCard("This country has no updated statistics yet", Icons.hourglass_empty);
+                                              }
+                                            } else if (snapshot.hasError) {
+                                              print(snapshot.error);
+                                              return Center(
+                                                child: CircularProgressIndicator(
+                                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                                ),
+                                              );
+                                            } else {
+                                              return Container(
+                                                height: MediaQuery.of(context).size.height * 0.7,
+                                                child: Center(
+                                                  child: CircularProgressIndicator(
+                                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
                                 ],
                               ),
                             );
@@ -637,32 +789,60 @@ Future<List<dynamic>>getRefreshedData()async{
                           }
                         },
                       ),
-                      // Container(
-                      //   color: Colors.transparent,
-                      // ),
+                      Container(
+                        color: Colors.transparent,
+                        child: Center(
+                          child: Container(
+                            height: MediaQuery.of(context).size.height*0.6,
+                            child: NotificationListener<OverscrollIndicatorNotification>(
+                              onNotification: (overScroll) {
+
+                                overScroll.disallowGlow();
+
+                                return;
+
+                              },
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    buildContactCard(Icons.phone, "Suwasariya Hotline", "1999"),
+                                    buildContactCard(Icons.phone, "Suwasariya Ambulance Service", "1990"),
+                                    buildContactCard(Icons.phone, "Epidemiology Unit", "011 269 5112"),
+                                    buildContactCard(Icons.phone, "Quarantine Unit", "011 211 2705"),
+                                    buildContactCard(Icons.phone, "Disaster Management Unit", "011 307 1073"),
+                                    buildContactCard(Icons.phone, "Health Promotion Bureau", "0112 696 606"),
+                                    buildContactCard(Icons.phone, "Coronavirus Advice", "1390"),
+                                    buildContactCard(Icons.phone, "Police Emergency Hotline", "119"),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 bottomNavigationBar: Container(
                   decoration: BoxDecoration(boxShadow: [
                     BoxShadow(
-                      color: Colors.black,
+                      color: Constants.theme == "Dark" ?Colors.black:Colors.white,
                       blurRadius: 6.0,
                       offset: Offset(0, -1),
                     ),
                   ]),
                   child: BottomAppBar(
                     elevation: 0,
-                    color: Colors.black,
+                    color: Constants.theme == "Dark" ?Colors.black:Colors.white,
                     child: TabBar(
-                      unselectedLabelColor: Colors.white54,
-                      labelColor: Colors.white,
+                      unselectedLabelColor: Constants.theme == "Dark" ?Colors.white54:Colors.black45,
+                      labelColor: Constants.theme == "Dark" ?Colors.white:Colors.black,
                       //indicatorColor: Colors.white,
-                      indicatorColor: Colors.redAccent,
+                      indicatorColor:Constants.theme == "Dark" ? Colors.redAccent:Colors.black,
                       tabs: [
                         buildTab(Icons.home),
                         buildTab(Icons.search),
-                        // buildTab(Icons.calendar_today),
+                        buildTab(Icons.phone),
                       ],
                     ),
                   ),

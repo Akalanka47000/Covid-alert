@@ -61,4 +61,9 @@ class CacheService{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences.getBool("loggedIn");
   }
+
+  static setTheme(String themeName) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setString("theme", themeName);
+  }
 }
