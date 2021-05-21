@@ -14,7 +14,10 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.lp = new LocationPicker('map',{
-      setCurrentPosition: true, // You can omit this, defaults to true
+      // setCurrentPosition: true, // You can omit this, defaults to true
+      lat:6.927079,
+      lng:79.861244,
+
   }, {
       zoom: 15 // You can set any google map options here, zoom defaults to 15
   });
