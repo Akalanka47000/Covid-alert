@@ -4,23 +4,24 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticationService {
+export class PatientService {
 
   constructor(private readonly http:HttpClient) { }
 
   //serverURL="http://ec2-13-213-51-110.ap-southeast-1.compute.amazonaws.com:8000";
   serverURL="http://192.168.8.102:8000";
   
-  userAuthentication(username:String,password:String){
-    let url = this.serverURL+"/user/login";
+  markPositive(email:String){
+    let url = this.serverURL+"/user/markPositive/"+email;
+    let Bearer = localStorage.getItem("Bearer");
     let header = new HttpHeaders({
       'Content-Type': 'application/json',
+      'Authorization':'Bearer '+Bearer,
     })
     let body = {
-      'email': username,
-      'password': password,
-      'device':"Web"
+      'positiveStatus': true,
+      'statusChangePermission': true,
     }
-    return this.http.post(url,body,{'headers':header});
+    return this.http.patch(url,body,{'headers':header});
   }
 }

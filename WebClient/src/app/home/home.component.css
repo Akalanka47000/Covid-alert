@@ -22,3 +22,18 @@
     background-size: cover;
  
   }
+
+  .txtField{
+      /* width: 20vw;
+      height: 5.1vh; */
+      margin-top: 1vh;
+      margin-bottom: 1vh;
+      border-radius: 5px;
+      padding-left:1vw;
+      border: 1px solid rgba(255, 255, 255, 1);
+  }
+
+  .txtField:focus {
+    border-radius: 5px;
+  }
+

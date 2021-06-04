@@ -81,13 +81,88 @@ exports.login = async (req, res) => {
   sendTokenResponse(user, 200, res);
 };
 
-// @desc    Update user location
-// @route   PUT /users/location/:id
+// @desc    Update user 
+// @route   PATCH /users/update/:id
 // @access  Private/Admin
 
 exports.updateUser =async (req, res,next) => {
 
   // const { location } = req.body;
+
+  let user = await User.findById(req.params.id);
+ 
+  if (!user) {
+    return next(
+      res.status(400).json({
+        message: `User not found with id of ${req.params.id}`,
+      })
+    );
+  }
+
+   
+
+
+   user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    data: user,
+  });
+};
+
+
+// @desc    Mark a user with given email as corona positive and give him permission to change his status
+// @route   PATCH /users/markPositive/:id   where id is the email of the user
+// @access  Private/Admin
+
+exports.markPositive =async (req, res,next) => {
+
+  const email=req.params.id;
+
+  const users=await User.find();
+
+  let found=false;
+  let userId;
+  for(let i=0;i<users.length;i++){
+    if(users[i].email==email){
+      found=true;
+      userId=users[i]._id;
+      break;
+    }
+  }
+
+ 
+  if (!found) {
+    return next(
+      res.status(400).json({
+        message: `User not found with email of ${email}`,
+      })
+    );
+  }else{
+    //update user
+    user = await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
+  
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  }
+};
+
+
+// @desc    Update user location and send out notifications about nearby patients
+// @route   PATCH /users/updateLocation/:id
+// @access  Private/Admin
+
+exports.updateLocation =async (req, res,next) => {
+
+
 
   let user = await User.findById(req.params.id);
  

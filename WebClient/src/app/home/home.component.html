@@ -15,6 +15,12 @@
         <div >
             <button mat-raised-button class="customBtn btn" color="primary" (click)="fileUpload.click()"  >Upload Images</button>
         </div>
+        <div style="width: 1vw;"></div>
+        <input type="text" class="txtField" placeholder="Patient email" [(ngModel)]="patientEmail">
+        <div style="width: 1vw;"></div>
+        <div>
+            <button mat-raised-button class="customBtn btn" color="primary" (click)="markAsPositive()"  >Mark as Positive</button>
+        </div>
     </div>
     <div style="height:1.5vh;">
 </div>

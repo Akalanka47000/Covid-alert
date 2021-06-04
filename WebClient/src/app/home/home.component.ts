@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import LocationPicker from "location-picker";
 import { NotificationService } from '../services/Notification/notification.service';
+import { PatientService } from '../services/Patient/patient.service';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -9,8 +10,9 @@ import Swal from 'sweetalert2'
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
+  patientEmail:any="";
   lp: any=undefined;
-  constructor(private readonly notificationService:NotificationService) { }
+  constructor(private readonly notificationService:NotificationService,private readonly patientService:PatientService) { }
 
   ngOnInit(): void {
     this.lp = new LocationPicker('map',{
@@ -74,6 +76,58 @@ export class HomeComponent implements OnInit {
       };
       reader.readAsDataURL(fileInput.target.files[0]);
     }
+  }
+
+  markAsPositive() {
+    var emailRegex = /\S+@\S+\.\S+/;
+    if(this.patientEmail==""){
+      Swal.fire({
+        icon: 'warning',
+        heightAuto: false,
+        title:'<small><b>Please fill in a patient email</b></small>',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }else if(!emailRegex.test(this.patientEmail)){
+      Swal.fire({
+        icon: 'warning',
+        heightAuto: false,
+        title:'<small><b>Invalid email format</b></small>',
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }else{
+      this.patientService.markPositive(this.patientEmail).subscribe((data:any)=>{
+        this.patientEmail="";
+        Swal.fire({
+          icon: 'success',
+          heightAuto: false,
+          title:'<small><b>Success</b></small>',
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      },
+      (err:any) =>{ 
+        if(err.error["message"].includes("User not found")){
+          Swal.fire({
+            icon: 'warning',
+            heightAuto: false,
+            title:'<small><b>Email has not been registered yet</b></small>',
+            showConfirmButton: false,
+            timer: 1500,
+          })
+        }else{
+          Swal.fire({
+            icon: 'error',
+            heightAuto: false,
+            title:'<small><b>An error has occured</b></small>',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      });
+    }
+  
   }
 
 }

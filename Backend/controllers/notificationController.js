@@ -1,5 +1,6 @@
 const Image = require("../models/Image");
 const User = require("../models/User");
+const distanceRetriever = require("../utils/distanceRetriever");
 
 var admin = require("firebase-admin");
 
@@ -23,7 +24,7 @@ exports.sendNotification = async (req, res) => {
     const users=await User.find();
 
     for(let i=0;i<users.length;i++){
-      let distance=getDistance(latitude,longitude,users[i].location.latitude,users[i].location.longitude);
+      let distance=distanceRetriever.getDistance(latitude,longitude,users[i].location.latitude,users[i].location.longitude);
       console.log(distance);
       if(distance<1 && users[i].notifications==true){
         var registrationToken = users[i].firebaseToken;
@@ -52,27 +53,6 @@ exports.sendNotification = async (req, res) => {
     });
   };
 
-
-  function degreesToRadians(degrees) {
-    return degrees * Math.PI / 180;
-  }
-  
-
-  //returns distance in km between two geo co-ords
-  function getDistance(lat1, lon1, lat2, lon2) {
-    var earthRadiusKm = 6371;
-  
-    var dLat = degreesToRadians(lat2-lat1);
-    var dLon = degreesToRadians(lon2-lon1);
-  
-    lat1 = degreesToRadians(lat1);
-    lat2 = degreesToRadians(lat2);
-  
-    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    return earthRadiusKm * c;
-  }
 
   exports.uploadImage = async (req, res) => {
 

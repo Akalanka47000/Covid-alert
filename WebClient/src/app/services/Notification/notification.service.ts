@@ -8,7 +8,8 @@ export class NotificationService {
 
   constructor(private readonly http:HttpClient) { }
 
-  serverURL="http://ec2-13-213-51-110.ap-southeast-1.compute.amazonaws.com:8000";
+  //serverURL="http://ec2-13-213-51-110.ap-southeast-1.compute.amazonaws.com:8000";
+  serverURL="http://192.168.8.102:8000";
 
   notifyUsers(latitude:any,longitude:any){
     let url = this.serverURL+"/notification/send";

@@ -38,14 +38,13 @@ Future<String> login(String url, String email, String password) async {
           if(locationServiceStatus==null){
             locationServiceStatus=false;
           }
-          if(!locationServiceStatus){
+          // if(!locationServiceStatus){
             BackgroundLocation.setAndroidNotification(
-              title: "Notification title",
-              message: "Notification message",
+              title: "Patient tracking active",
               icon: "@mipmap/ic_launcher",
             );
             BackgroundLocation.setAndroidConfiguration(1000);
-            BackgroundLocation.startLocationService(distanceFilter : 1);
+            BackgroundLocation.startLocationService(distanceFilter : 10);
             BackgroundLocation.getLocationUpdates((location) async{
               print(location.latitude);
               print(location.longitude);
@@ -54,7 +53,7 @@ Future<String> login(String url, String email, String password) async {
               await updateLocation(url,location.latitude,location.longitude,Constants.userData["_id"]);
             });
             await CacheService.setLocationServiceStatus(true);
-          }
+          //}
           await CacheService.saveUserEmail(email);
           await CacheService.saveUserPassword(password);
           await CacheService.saveLoggedInStatus(true);
@@ -99,31 +98,24 @@ Future<String> registerUser(String url, String email, String password, String na
         await CacheService.saveJWTToken(responseJson["token"]);
         String updateStatus=await updateFCMToken(url,firebaseToken,Constants.userData["_id"]);
         if(updateStatus==null){
-          var locationUpdateStatus="";
           BackgroundLocation.setAndroidNotification(
-            title: "Notification title",
-            message: "Notification message",
+            title: "Patient tracking active",
             icon: "@mipmap/ic_launcher",
           );
           BackgroundLocation.setAndroidConfiguration(1000);
-          BackgroundLocation.startLocationService(distanceFilter : 1);
+          BackgroundLocation.startLocationService(distanceFilter : 10);
           BackgroundLocation.getLocationUpdates((location) async{
             print(location.latitude);
             print(location.longitude);
             Constants.userData["location"]["latitude"]=location.latitude;
             Constants.userData["location"]["longitude"]=location.longitude;
-            locationUpdateStatus=await updateLocation(url,location.latitude,location.longitude,Constants.userData["_id"]);
+            await updateLocation(url,location.latitude,location.longitude,Constants.userData["_id"]);
           });
-          if(locationUpdateStatus==null){
-            await CacheService.saveUserEmail(email);
-            await CacheService.saveUserPassword(password);
-            await CacheService.saveLoggedInStatus(true);
-            await CacheService.setLocationServiceStatus(true);
-            return null;
-          }else{
-            return locationUpdateStatus;
-          }
-
+          await CacheService.saveUserEmail(email);
+          await CacheService.saveUserPassword(password);
+          await CacheService.saveLoggedInStatus(true);
+          await CacheService.setLocationServiceStatus(true);
+          return null;
         }else{
           return updateStatus;
         }

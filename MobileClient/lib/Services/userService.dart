@@ -36,7 +36,7 @@ Future<String> updateFCMToken(String url, String fcmToken,String userID) async {
 Future<String> updateLocation(String url,double latitude, double longitude,String userID) async {
   print("updating user");
   try {
-    Uri endpoint = Uri.parse('$url/user/update/$userID');
+    Uri endpoint = Uri.parse('$url/user/updateLocation/$userID');
     String jwtToken = await CacheService.getJWTToken();
     var data = {
       "location":{
