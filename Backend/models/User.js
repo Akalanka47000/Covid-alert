@@ -50,6 +50,14 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  positiveStatus: {
+    type: Boolean,
+    default: false,
+  },
+  statusChangePermission: {
+    type: Boolean,
+    default: false,
+  },
   location: {
     type:locationSchema,
     default:{

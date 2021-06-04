@@ -100,13 +100,7 @@ exports.updateUser =async (req, res,next) => {
   }
 
    
-  // if (!location.latitude || !location.longitude) {
-  //   return next(
-  //     res.status(400).json({
-  //       message: `latitude or longitude is missing`,
-  //     })
-  //   );
-  // }
+
 
    user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -138,5 +132,5 @@ const sendTokenResponse = (user, statusCode, res) => {
   res
     .status(statusCode)
     .cookie("token", token, options)
-    .json({ success: true,userID:user.id,notificationStatus:user.notifications,token });
+    .json({ success: true,token,userData:user});
 };

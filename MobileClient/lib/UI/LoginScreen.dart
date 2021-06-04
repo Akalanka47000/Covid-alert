@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:covid_alert/Helpers/Constants.dart';
-import 'package:covid_alert/View/CustomWidgets/bezierContainer.dart';
+import 'package:covid_alert/UI/CustomWidgets/bezierContainer.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:covid_alert/Controllers/authController.dart';
-import 'package:covid_alert/View/Register.dart';
-import 'package:covid_alert/View/HomeScreen.dart';
+import 'package:covid_alert/Services/authService.dart';
+import 'package:covid_alert/UI/Register.dart';
+import 'package:covid_alert/UI/HomeScreen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage("assets/images/BG.jpg"),
-                  colorFilter:  Constants.theme == "Dark" ?new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken):new ColorFilter.mode(Colors.white.withOpacity(0.8), BlendMode.hardLight),
+                  colorFilter:  Constants.theme == "Dark" ?new ColorFilter.mode(Colors.black.withOpacity(0.8), BlendMode.darken):new ColorFilter.mode(Colors.white.withOpacity(0.9), BlendMode.hardLight),
                   fit: BoxFit.cover,
                 ),
               ),

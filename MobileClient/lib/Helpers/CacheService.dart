@@ -62,6 +62,17 @@ class CacheService{
     return preferences.getBool("loggedIn");
   }
 
+  static setLocationServiceStatus(bool status)async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setBool("locationService", status);
+  }
+
+  static Future<bool> getLocationServiceStatus() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    return preferences.getBool("locationService");
+  }
+
+
   static setTheme(String themeName) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.setString("theme", themeName);

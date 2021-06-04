@@ -90,7 +90,7 @@ class _InformationDialogState extends State<InformationDialog> {
           Radius.circular(20.0),
         ),
       ),
-      backgroundColor:  Constants.theme == "Dark" ?Colors.black:Colors.white.withOpacity(0.95),
+      backgroundColor:  Constants.theme == "Dark" ?Colors.black:Color(0xFFf2f2f2),
       content: DefaultTabController(
         length: 16,
         child: Container(
