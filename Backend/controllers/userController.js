@@ -1,4 +1,9 @@
 const User = require("../models/User");
+const distanceRetriever = require("../utils/distanceRetriever");
+
+var admin = require("firebase-admin");
+
+
 
 exports.register = async (req, res) => {
   const { name, email, password, location } = req.body;
@@ -181,6 +186,128 @@ exports.updateLocation =async (req, res,next) => {
     new: true,
     runValidators: true,
   });
+
+  
+
+  const users=await User.find();
+
+  let sendingUser = await User.findById(req.params.id);
+
+  let totalPatientCount=0;
+
+  for(let i=0;i<users.length;i++){
+
+    let distance=distanceRetriever.getDistance(req.body.location.latitude,req.body.location.longitude,users[i].location.latitude,users[i].location.longitude);
+    console.log(distance);
+    console.log(users[i]._id);
+    if(distance<0.005 && users[i]._id.toString()!=req.params.id.toString()){
+
+      //add the person who sent location update to the interacted list of the detected person close to him 
+      let interactees=users[i].interactedWith;
+      //console.log(interactees);
+      let alreadyInList=false;
+      for(let j=0;j<interactees.length;j++){
+        if(interactees[j].userId.toString()==req.params.id){
+          alreadyInList=true;
+          break;
+        }
+      }
+      if(!alreadyInList){
+        interactees.push(
+          {
+            "userId":req.params.id.toString(),
+            "interactionTime":Date.now,
+          }
+        );
+      }
+    
+      await User.findByIdAndUpdate(users[i]._id, {"interactedWith":interactees}, {
+        new: true,
+        runValidators: true,
+      });
+
+       //add the person close to him to the interacted list of the person who sent the location update
+      
+    
+       alreadyInList=false;
+       for(let j=0;j<sendingUser.interactedWith.length;j++){
+         if(sendingUser.interactedWith[j].userId.toString()==users[i]._id.toString()){
+           alreadyInList=true;
+           break;
+         }
+       }
+       if(!alreadyInList){
+        sendingUser.interactedWith.push(
+           {
+             "userId":users[i]._id.toString(),
+             "interactionTime":Date.now,
+           }
+         );
+       }
+
+       await User.findByIdAndUpdate(req.params.id, {
+        "interactedWith":sendingUser.interactedWith,
+      }, {
+        new: true,
+        runValidators: true,
+      });
+
+     
+      //add to total if user is positive
+      if(users[i].positiveStatus==true && !sendingUser.alreadyNotifiedList.includes(users[i]._id.toString())){
+        totalPatientCount++;
+        sendingUser.alreadyNotifiedList.push(users[i]._id.toString());
+        await User.findByIdAndUpdate(req.params.id, {
+          "alreadyNotifiedList":sendingUser.alreadyNotifiedList
+        }, {
+          new: true,
+          runValidators: true,
+        });
+      }
+    }
+  
+  }
+  console.log("done");
+console.log(totalPatientCount);
+  // //update sendingUser
+  // await User.findByIdAndUpdate(req.params.id, {
+  //   "interactedWith":sendingUser.interactedWith,
+  //   "alreadyNotifiedList":sendingUser.alreadyNotifiedList
+  // }, {
+  //   new: true,
+  //   runValidators: true,
+  // });
+
+  if(totalPatientCount!=0 && sendingUser.notifications==true ){
+    var registrationToken = sendingUser.firebaseToken;
+    let body;
+    let title;
+    if(totalPatientCount==1){
+      title="Patient Detected in the Vicinity"
+      body="You are in an area close to a covid patient";
+    }else{
+      title="Patients Detected in the Vicinity";
+      body="You are in an area close to "+totalPatientCount+" covid patients";
+    }
+   
+    var payload = {
+      notification: {
+        title: title,
+        body: body,
+      }
+    };
+    var options = {
+      priority: "normal",
+      timeToLive: 60 * 60
+    };
+    admin.messaging().sendToDevice(registrationToken, payload, options)
+    .then(function(response) {
+      console.log("Successfully sent message:", response);
+    })
+    .catch(function(error) {
+      console.log("Error sending message:", error);
+    });
+  }
 
   res.status(200).json({
     success: true,

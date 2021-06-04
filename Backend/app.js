@@ -18,6 +18,15 @@ mongoose.connection.once("open", () => {
   console.log("MongoDB Connected!");
 });
 
+//initialize firebase admin sdk
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+
 const app = express();
 
 app.use(express.json());

@@ -4,11 +4,11 @@ const distanceRetriever = require("../utils/distanceRetriever");
 
 var admin = require("firebase-admin");
 
-var serviceAccount = require("../serviceAccountKey.json");
+// var serviceAccount = require("../serviceAccountKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 exports.sendNotification = async (req, res) => {
   

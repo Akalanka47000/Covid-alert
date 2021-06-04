@@ -44,7 +44,7 @@ Future<String> login(String url, String email, String password) async {
               icon: "@mipmap/ic_launcher",
             );
             BackgroundLocation.setAndroidConfiguration(1000);
-            BackgroundLocation.startLocationService(distanceFilter : 10);
+            BackgroundLocation.startLocationService(distanceFilter : 1);
             BackgroundLocation.getLocationUpdates((location) async{
               print(location.latitude);
               print(location.longitude);
@@ -103,7 +103,7 @@ Future<String> registerUser(String url, String email, String password, String na
             icon: "@mipmap/ic_launcher",
           );
           BackgroundLocation.setAndroidConfiguration(1000);
-          BackgroundLocation.startLocationService(distanceFilter : 10);
+          BackgroundLocation.startLocationService(distanceFilter : 1);
           BackgroundLocation.getLocationUpdates((location) async{
             print(location.latitude);
             print(location.longitude);

@@ -17,6 +17,16 @@ const locationSchema=mongoose.Schema({
   },
 });
 
+const interactee=mongoose.Schema({
+  userId: {
+    type: String,
+  },
+  interactionTime: {
+    type: Date,
+    default:Date.now,
+  },
+});
+
 const UserSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -66,7 +76,17 @@ const UserSchema = new mongoose.Schema({
         "longitude":-1.0
       }
     },
-  },  
+  },
+  alreadyNotifiedList:[
+    {
+      type:String,
+    },
+  ],
+  interactedWith:[
+    {
+      type:interactee,
+    },
+  ],
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
