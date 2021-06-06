@@ -5,7 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:covid_alert/UI/Splash.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
@@ -16,6 +16,7 @@ void main() async {
   GestureBinding.instance.resamplingEnabled = true;
   await Firebase.initializeApp();
   await PushNotificationService.initialize();
+  await Permission.location.request();
   runApp(LMK());
 }
 

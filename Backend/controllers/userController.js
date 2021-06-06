@@ -267,7 +267,6 @@ exports.updateLocation =async (req, res,next) => {
     }
   
   }
-  console.log("done");
 console.log(totalPatientCount);
   // //update sendingUser
   // await User.findByIdAndUpdate(req.params.id, {
