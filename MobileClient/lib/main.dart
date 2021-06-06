@@ -17,10 +17,10 @@ void main() async {
   await Firebase.initializeApp();
   await PushNotificationService.initialize();
   await Permission.location.request();
-  runApp(LMK());
+  runApp(CovidAlert());
 }
 
-class LMK extends StatelessWidget {
+class CovidAlert extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Constants().initialize();
